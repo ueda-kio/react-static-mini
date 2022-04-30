@@ -93,12 +93,6 @@ module.exports = () => {
 							},
 						}, ],
 					},
-					{
-						enforce: 'pre',
-						test: /\.js$|\.jsx$|\.tsx$|\.tsx$/,
-						exclude: /node_modules/,
-						loader: 'eslint-loader',
-					},
 				],
 			},
 			devServer: {
