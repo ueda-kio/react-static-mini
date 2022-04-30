@@ -27,7 +27,7 @@ export default () => `
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-${renderToStaticMarkup(<Head title={pageMeta.title} />)}
+${renderToStaticMarkup(<Head url={pageMeta.url} />)}
 </head>
 <body>
 ${renderToStaticMarkup(<Content />)}

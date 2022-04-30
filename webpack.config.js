@@ -1,18 +1,11 @@
 const path = require('path');
 const globule = require('globule');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const {HtmlWebpackSkipAssetsPlugin} = require('html-webpack-skip-assets-plugin');
 
 const assignPlugins = () => {
 	const assignObject = {
 		plugins: [
-			new CleanWebpackPlugin({
-				cleanOnceBeforeBuildPatterns: [
-					'assets/stylesheet',
-					'assets/js',
-				]
-			}),
 			new HtmlWebpackSkipAssetsPlugin({
 				excludeAssets: [/main.js/]
 			})
@@ -56,7 +49,6 @@ module.exports = () => {
 				ignored: /node_modules/
 			},
 			resolve: {
-				// 拡張子を省略してimportできるようになる
 				extensions: ['.js', '.ts', '.tsx'],
 			},
 			module: {
@@ -69,29 +61,6 @@ module.exports = () => {
 							presets: ['@babel/preset-typescript', '@babel/preset-react']
 						}
 					}]
-					},
-					{
-						test: /\.js$/,
-						exclude: /node_modules/,
-						use: [{
-							loader: 'babel-loader',
-							options: {
-								// promiseを使えるようにするヤツ
-								presets: ['@babel/preset-env', '@babel/preset-react'],
-								plugins: ['@babel/plugin-transform-runtime'],
-							},
-						}, ],
-					},
-					{
-						test: /\.ts$/,
-						exclude: /node_modules/,
-						use: [{
-							loader: 'babel-loader',
-							options: {
-								presets: ['@babel/preset-typescript'],
-								plugins: ['@babel/proposal-class-properties'],
-							},
-						}, ],
 					},
 				],
 			},
