@@ -1,27 +1,21 @@
 const path = require('path');
 const globule = require('globule');
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
-const TerserPlugin = require("terser-webpack-plugin");
-const FixStyleOnlyEntriesPlugin = require('webpack-fix-style-only-entries');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const {HtmlWebpackSkipAssetsPlugin} = require('html-webpack-skip-assets-plugin');
 
-// ejsファイルが増えても問題ないような処置
-const assignPlugins = (env_mode) => {
+const assignPlugins = () => {
 	const assignObject = {
 		plugins: [
-			new FixStyleOnlyEntriesPlugin(),
 			new CleanWebpackPlugin({
 				cleanOnceBeforeBuildPatterns: [
 					'assets/stylesheet',
-					'assets/javascript',
+					'assets/js',
 				]
 			}),
-			//なんかいいヤツらしい。
-			new HtmlWebpackHarddiskPlugin({
-				alwaysWriteToDisk: true
-			}),
+			new HtmlWebpackSkipAssetsPlugin({
+				excludeAssets: [/main.js/]
+			})
 		]
 	};
 
@@ -37,13 +31,6 @@ const assignPlugins = (env_mode) => {
 		const _obj = {
 			filename: filename,
 			template: template,
-			// prod時にコメントだけ削除する
-			minify: env_mode ?
-				false :
-				{
-					collapseWhitespace: false,
-					removeComments: true,
-				},
 		};
 
 		assignObject.plugins.push(new HtmlWebpackPlugin(_obj));
@@ -56,19 +43,15 @@ const assignPlugins = (env_mode) => {
 	return assignObject;
 };
 
-module.exports = (env, argv) => {
-	const is_DEVELOP = argv.mode === "development";
-
+module.exports = () => {
 	return [
 		Object.assign({
 			entry: './src/js/main',
 			output: {
 				path: path.join(__dirname, 'dist'),
-				filename: is_DEVELOP ?
-					'assets/javascript/[name].js' :
-					'assets/javascript/[name].[contenthash].js',
+				filename: 'js/[name].js'
 			},
-			devtool: is_DEVELOP ? 'source-map' : 'eval',
+			devtool: false,
 			watchOptions: {
 				ignored: /node_modules/
 			},
@@ -76,19 +59,6 @@ module.exports = (env, argv) => {
 				// 拡張子を省略してimportできるようになる
 				extensions: ['.js', '.ts', '.tsx'],
 			},
-
-			// UglifyJSPluginは非推奨
-			optimization: {
-				minimize: is_DEVELOP ? false : true,
-				minimizer: [
-					new TerserPlugin({
-						terserOptions: {
-							ecma: 2020,
-						}
-					})
-				]
-			},
-
 			module: {
 				rules: [
 					{
@@ -135,10 +105,7 @@ module.exports = (env, argv) => {
 				contentBase: path.resolve(__dirname, 'dist'),
 				port: 8080,
 			},
-			stats: {
-				children: true //現状機能していない模様
-			},
 			target: "web",
-		}, assignPlugins(is_DEVELOP))
+		}, assignPlugins())
 	]
 }

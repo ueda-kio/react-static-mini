@@ -17,7 +17,7 @@ const Content: React.FC = () => {
 			<main>
 				<h1>トップページのコンテンツ</h1>
 				<div id="app"></div>
-				<span className='test'>hogehoge</span>
+				<span className='test'>hoge</span>
 			</main>
 		</>
 	)
