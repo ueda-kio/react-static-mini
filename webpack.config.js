@@ -5,34 +5,23 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
 const TerserPlugin = require("terser-webpack-plugin");
-const CopyPlugin = require("copy-webpack-plugin");
+const FixStyleOnlyEntriesPlugin = require('webpack-fix-style-only-entries');
 
 // ejsファイルが増えても問題ないような処置
 const assignPlugins = (env_mode) => {
 	const assignObject = {
 		plugins: [
+			new FixStyleOnlyEntriesPlugin(),
 			new CleanWebpackPlugin({
 				cleanOnceBeforeBuildPatterns: [
 					'assets/stylesheet',
 					'assets/javascript',
 				]
 			}),
-			new MiniCssExtractPlugin({
-				filename: env_mode ?
-					'assets/stylesheet/bundle.css' :
-					'assets/stylesheet/bundle.[contenthash].css',
-			}),
 			//なんかいいヤツらしい。
 			new HtmlWebpackHarddiskPlugin({
 				alwaysWriteToDisk: true
 			}),
-			// 画像をassets/images/にコピー
-			new CopyPlugin({
-				patterns: [{
-					from: "src/images/",
-					to: "assets/images/"
-				}]
-			})
 		]
 	};
 
@@ -48,8 +37,6 @@ const assignPlugins = (env_mode) => {
 		const _obj = {
 			filename: filename,
 			template: template,
-			// 指定しないとjsもhead内に書かれちゃう
-			inject: 'body',
 			// prod時にコメントだけ削除する
 			minify: env_mode ?
 				false :
@@ -74,10 +61,7 @@ module.exports = (env, argv) => {
 
 	return [
 		Object.assign({
-			entry: {
-				mainJs: './src/js/main',
-				mainTs: './src/ts/main'
-			},
+			entry: './src/js/main',
 			output: {
 				path: path.join(__dirname, 'dist'),
 				filename: is_DEVELOP ?
@@ -106,43 +90,7 @@ module.exports = (env, argv) => {
 			},
 
 			module: {
-				rules: [{
-						test: /\.ejs$/,
-						use: 'ejs-compiled-loader',
-					},
-					{
-						test: /\.scss$/,
-						use: [
-							MiniCssExtractPlugin.loader,
-							{
-								loader: 'css-loader',
-								options: {
-									url: false, // sassで相対パスを書けるようにする
-									sourceMap: true,
-								},
-							},
-							{
-								loader: 'postcss-loader',
-								options: {
-									postcssOptions: {
-										plugins: [
-											[
-												require('autoprefixer')({
-													grid: true
-												}),
-											],
-										],
-									}
-								}
-							},
-							{
-								loader: 'sass-loader',
-								options: {
-									implementation: require('sass'),
-								},
-							},
-						]
-					},
+				rules: [
 					{
 					test: /\.tsx$/,
 					use: [{
@@ -175,12 +123,12 @@ module.exports = (env, argv) => {
 							},
 						}, ],
 					},
-					// {
-					// 	enforce: 'pre',
-					// 	test: /\.js$|\.jsx$|\.tsx$|\.tsx$/,
-					// 	exclude: /node_modules/,
-					// 	loader: 'eslint-loader',
-					// },
+					{
+						enforce: 'pre',
+						test: /\.js$|\.jsx$|\.tsx$|\.tsx$/,
+						exclude: /node_modules/,
+						loader: 'eslint-loader',
+					},
 				],
 			},
 			devServer: {

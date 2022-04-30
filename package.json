@@ -6,9 +6,8 @@
 	"scripts": {
 		"start": "webpack serve --mode=development",
 		"build": "webpack --mode=development && prettier --write dist/index.html",
-		"prod": "webpack --mode=production",
-		"watch": "webpack -w --mode=development",
-		"mkscss": "node createScssFile.js"
+		"prod": "webpack --mode=production && prettier --write dist/index.html",
+		"watch": "webpack -w --mode=development"
 	},
 	"keywords": [],
 	"author": "",
@@ -58,7 +57,8 @@
 		"vite": "^2.9.4",
 		"webpack": "^5.28.0",
 		"webpack-cli": "^4.6.0",
-		"webpack-dev-server": "^3.11.2"
+		"webpack-dev-server": "^3.11.2",
+		"webpack-fix-style-only-entries": "^0.6.1"
 	},
 	"dependencies": {
 		"web-encoding": "1.1.3"
